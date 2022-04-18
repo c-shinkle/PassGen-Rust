@@ -1,3 +1,7 @@
+use pass_gen::pass_gen::pass_gen;
+
 fn main() {
-    println!("Hello, world!");
+    let password = pass_gen(15);
+
+    println!("{:?}", password);
 }
