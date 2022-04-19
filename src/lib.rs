@@ -22,20 +22,18 @@ pub mod pass_gen {
     pub fn pass_gen(size: usize) -> String {
         //setup randomness and password
         let mut rng = thread_rng();
-        let mut password: Vec<u8> = vec![0; size];
+        let mut password: Vec<u8> = Vec::with_capacity(size);
         //guarantee at least one of each type of letter
-        let mut indices: [usize; 4] = [0, 1, 2, 3];
-        shuffle(&mut rng, &mut indices);
-        password[indices[0]] = sample(&mut rng, &NUMBERS);
-        password[indices[1]] = sample(&mut rng, &LOWER);
-        password[indices[2]] = sample(&mut rng, &UPPER);
-        password[indices[3]] = sample(&mut rng, &SPECIALS);
+        password.push(sample(&mut rng, &NUMBERS));
+        password.push(sample(&mut rng, &LOWER));
+        password.push(sample(&mut rng, &UPPER));
+        password.push(sample(&mut rng, &SPECIALS));
         //randomly sample the rest
-        for i in 0..size {
-            if password[i] == 0 {
-                password[i] = sample(&mut rng, &ALL);
-            }
+        for _ in 4..size {
+            password.push(sample(&mut rng, &ALL));
         }
+        //shuffle to guarantee random order
+        shuffle(&mut rng, &mut password);
         //build (unsafe) ASCII String quickly
         return unsafe { String::from_utf8_unchecked(password) };
     }
