@@ -19,6 +19,7 @@ pub mod pass_gen {
         }
     }
 
+    //build vec of random chars, then build String from vec
     pub fn pass_gen(size: usize) -> String {
         //setup randomness and password
         let mut rng = thread_rng();
@@ -37,4 +38,6 @@ pub mod pass_gen {
         //build (unsafe) ASCII String quickly
         return unsafe { String::from_utf8_unchecked(password) };
     }
+
+    //build string of random chars, then go back and guarantee each of the 4 groups
 }
