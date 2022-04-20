@@ -3,7 +3,7 @@ use rand::thread_rng;
 
 fn main() {
     let mut rng = thread_rng();
-    for _ in 0..1 {
-        println!("{}", pass_gen(10, &mut rng));
+    for _ in 0..1000 {
+        println!("{}", pass_gen(15, &mut rng));
     }
 }
