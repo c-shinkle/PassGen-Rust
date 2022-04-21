@@ -1,7 +1,5 @@
 pub mod pass_gen {
-    use rand::rngs::ThreadRng;
-    use rand::Rng;
-    use rand::prelude::SliceRandom;
+    use rand::prelude::*;
 
     const NUMBERS: [char; 10] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
     const LOWER: [char; 26] = [
@@ -26,27 +24,19 @@ pub mod pass_gen {
     ];
 
     fn sample(rng: &mut ThreadRng, data: &[char]) -> u8 {
-        data[rng.gen_range(0..data.len())] as u8
+        *data.choose(rng).unwrap() as u8
     }
 
-    //build vec of random chars, then build String from vec
     pub fn pass_gen(size: usize, rng: &mut ThreadRng) -> String {
-        //setup password
         let mut password: Vec<u8> = Vec::with_capacity(size);
-        //guarantee at least one of each type of letter
         password.push(sample(rng, &NUMBERS));
         password.push(sample(rng, &LOWER));
         password.push(sample(rng, &UPPER));
         password.push(sample(rng, &SPECIALS));
-        //randomly sample the rest
         for _ in 4..size {
             password.push(sample(rng, &ALL));
         }
-        //shuffle to guarantee random order
         password.shuffle(rng);
-        //build (unsafe) ASCII String quickly
-        return unsafe { String::from_utf8_unchecked(password) };
+        unsafe { String::from_utf8_unchecked(password) }
     }
-
-    //build string of random chars, then go back and guarantee each of the 4 groups
 }
