@@ -28,15 +28,21 @@ pub mod pass_gen {
     }
 
     pub fn pass_gen(size: usize, rng: &mut ThreadRng) -> String {
-        let mut password: Vec<u8> = Vec::with_capacity(size);
-        password.push(sample(rng, &NUMBERS));
-        password.push(sample(rng, &LOWER));
-        password.push(sample(rng, &UPPER));
-        password.push(sample(rng, &SPECIALS));
-        for _ in 4..size {
-            password.push(sample(rng, &ALL));
+        let indices: Vec<usize> = (0..size)
+            .collect::<Vec<usize>>()
+            .choose_multiple(rng, 4)
+            .cloned()
+            .collect();
+        let mut password: Vec<u8> = vec![0; size];
+        password[indices[0]] = sample(rng, &NUMBERS);
+        password[indices[1]] = sample(rng, &LOWER);
+        password[indices[2]] = sample(rng, &UPPER);
+        password[indices[3]] = sample(rng, &SPECIALS);
+        for letter in password.iter_mut() {
+            if *letter == 0 {
+                *letter = sample(rng, &ALL)
+            }
         }
-        password.shuffle(rng);
         unsafe { String::from_utf8_unchecked(password) }
     }
 }
