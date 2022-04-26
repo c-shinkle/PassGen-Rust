@@ -1,5 +1,5 @@
 pub mod pass_gen {
-    use rand::prelude::*;
+    use rand::prelude::{SliceRandom, ThreadRng};
 
     const NUMBERS: [char; 10] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
     const LOWER: [char; 26] = [
@@ -23,10 +23,6 @@ pub mod pass_gen {
         '{', '|', '}', '~',
     ];
 
-    fn sample(rng: &mut ThreadRng, data: &[char]) -> u8 {
-        *data.choose(rng).unwrap() as u8
-    }
-
     pub fn pass_gen(size: usize, rng: &mut ThreadRng) -> String {
         let indices: Vec<usize> = (0..size)
             .collect::<Vec<usize>>()
@@ -44,5 +40,9 @@ pub mod pass_gen {
             }
         }
         unsafe { String::from_utf8_unchecked(password) }
+    }
+
+    fn sample(rng: &mut ThreadRng, data: &[char]) -> u8 {
+        *data.choose(rng).unwrap() as u8
     }
 }
