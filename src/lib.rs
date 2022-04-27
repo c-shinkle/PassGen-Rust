@@ -36,7 +36,7 @@ pub mod pass_gen {
         password[indices[3]] = sample(rng, &SPECIALS);
         for letter in password.iter_mut() {
             if *letter == 0 {
-                *letter = sample(rng, &ALL)
+                *letter = sample(rng, &ALL);
             }
         }
         unsafe { String::from_utf8_unchecked(password) }
