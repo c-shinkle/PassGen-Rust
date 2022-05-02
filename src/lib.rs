@@ -1,20 +1,11 @@
 pub mod pass_gen {
-    use rand::prelude::{SliceRandom, ThreadRng};
+    use rand::prelude::{SliceRandom, ThreadRng, Rng};
 
-    const NUMBERS: [char; 10] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    const LOWER: [char; 26] = [
-        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-        's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-    ];
-    const UPPER: [char; 26] = [
-        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-        'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-    ];
-    const SPECIALS: [char; 32] = [
-        '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<',
-        '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~',
-    ];
-    const ALL: [char; 94] = [
+    // NUMBERS: 0..10;
+    // LOWER: 10..36;
+    // UPPER: 36..62;
+    // SPECIALS: 62..94;
+    const LETTERS: [char; 94] = [
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
         'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
@@ -30,19 +21,19 @@ pub mod pass_gen {
             .cloned()
             .collect();
         let mut password: Vec<u8> = vec![0; size];
-        password[indices[0]] = sample(rng, &NUMBERS);
-        password[indices[1]] = sample(rng, &LOWER);
-        password[indices[2]] = sample(rng, &UPPER);
-        password[indices[3]] = sample(rng, &SPECIALS);
+        password[indices[0]] = sample(rng, 10, 0);
+        password[indices[1]] = sample(rng, 26, 10);
+        password[indices[2]] = sample(rng, 26, 36);
+        password[indices[3]] = sample(rng, 32, 62);
         for letter in password.iter_mut() {
             if *letter == 0 {
-                *letter = sample(rng, &ALL);
+                *letter = sample(rng, 94, 0);
             }
         }
         unsafe { String::from_utf8_unchecked(password) }
     }
 
-    fn sample(rng: &mut ThreadRng, data: &[char]) -> u8 {
-        *data.choose(rng).unwrap() as u8
+    fn sample(rng: &mut ThreadRng, length: u8, offset: u8) -> u8 {
+        LETTERS[((rng.gen::<u8>() % length) + offset) as usize] as u8
     }
 }
