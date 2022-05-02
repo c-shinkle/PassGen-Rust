@@ -33,7 +33,7 @@ pub mod pass_gen {
         unsafe { String::from_utf8_unchecked(password) }
     }
 
-    fn sample(rng: &mut ThreadRng, length: u8, offset: u8) -> u8 {
-        LETTERS[((rng.gen::<u8>() % length) + offset) as usize] as u8
+    fn sample(rng: &mut ThreadRng, length: u32, offset: u32) -> u8 {
+        LETTERS[((rng.gen::<u32>() % length) + offset) as usize] as u8
     }
 }
