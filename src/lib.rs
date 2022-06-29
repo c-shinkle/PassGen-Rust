@@ -1,5 +1,5 @@
 pub mod pass_gen {
-    use rand::prelude::{SliceRandom, ThreadRng, Rng};
+    use rand::prelude::{Rng, SliceRandom, ThreadRng};
 
     // NUMBERS: 0..10;
     // LOWER: 10..36;
@@ -15,16 +15,13 @@ pub mod pass_gen {
     ];
 
     pub fn pass_gen(size: usize, rng: &mut ThreadRng) -> String {
-        let indices: Vec<usize> = (0..size)
-            .collect::<Vec<usize>>()
-            .choose_multiple(rng, 4)
-            .cloned()
-            .collect();
+        let non_random_indices = (0..size).collect::<Vec<usize>>();
+        let random_indices: Vec<&usize> = non_random_indices.choose_multiple(rng, 4).collect();
         let mut password: Vec<u8> = vec![0; size];
-        password[indices[0]] = sample(rng, 10, 0);
-        password[indices[1]] = sample(rng, 26, 10);
-        password[indices[2]] = sample(rng, 26, 36);
-        password[indices[3]] = sample(rng, 32, 62);
+        password[*random_indices[0]] = sample(rng, 10, 00);
+        password[*random_indices[1]] = sample(rng, 26, 10);
+        password[*random_indices[2]] = sample(rng, 26, 36);
+        password[*random_indices[3]] = sample(rng, 32, 62);
         for letter in password.iter_mut() {
             if *letter == 0 {
                 *letter = sample(rng, 94, 0);
