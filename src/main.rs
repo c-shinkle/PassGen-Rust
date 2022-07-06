@@ -1,4 +1,4 @@
-use pass_gen::pass_gen::pass_gen;
+use pass_gen::pass_gen;
 use rand::thread_rng;
 
 fn main() {

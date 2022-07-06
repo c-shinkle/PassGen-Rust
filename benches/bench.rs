@@ -5,7 +5,7 @@ extern crate test;
 
 #[cfg(test)]
 mod tests {
-    use pass_gen::pass_gen::pass_gen;
+    use pass_gen::pass_gen;
     use rand::thread_rng;
     use test::Bencher;
 
@@ -16,6 +16,6 @@ mod tests {
             for _ in 0..1000 {
                 pass_gen(1000, &mut rng);
             }
-        })
+        });
     }
 }
