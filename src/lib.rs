@@ -15,7 +15,7 @@ pub mod pass_gen {
     ];
 
     pub fn pass_gen(size: usize, rng: &mut ThreadRng) -> String {
-        let non_random_indices = (0..size).collect::<Vec<usize>>();
+        let non_random_indices: Vec<usize> = (0..size).collect();
         let random_indices: Vec<&usize> = non_random_indices.choose_multiple(rng, 4).collect();
         let mut password: Vec<u8> = vec![0; size];
         password[*random_indices[0]] = sample(rng, 10, 00);
