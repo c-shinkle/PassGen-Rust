@@ -12,9 +12,10 @@ mod tests {
     #[bench]
     fn thousand_passwords_thousand_letters(b: &mut Bencher) {
         let mut rng = thread_rng();
+        let mut buffer = [0; 1000];
         b.iter(|| {
             for _ in 0..1000 {
-                pass_gen(1000, &mut rng);
+                pass_gen(&mut buffer, &mut rng);
             }
         });
     }

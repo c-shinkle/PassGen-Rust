@@ -1,35 +1,51 @@
-use rand::rngs::ThreadRng;
-use rand::seq::SliceRandom;
-use rand::Rng;
-use std::iter::FromIterator;
+use rand::{Rng, RngCore};
 
 // NUMBERS: 0..10;
 // LOWER: 10..36;
 // UPPER: 36..62;
 // SPECIALS: 62..94;
-const LETTERS: [char; 94] = [
-    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-    'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B',
-    'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-    'V', 'W', 'X', 'Y', 'Z', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.',
-    '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~',
-];
+const LETTERS: &[u8] = b"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
-pub fn pass_gen(size: u32, rng: &mut ThreadRng) -> String {
-    assert!(size >= 4);
-    let mut password: Vec<u8> = vec![0; size as usize];
-    for letter in password.iter_mut() {
+pub fn pass_gen(buffer: &mut [u8], rng: &mut impl RngCore) {
+    assert!(buffer.len() as u32 >= 4);
+    for letter in buffer.iter_mut() {
         *letter = sample(rng, 94, 0);
     }
-    let non_random_indexes = Vec::from_iter(0..size);
-    let random_indexes: Vec<&u32> = non_random_indexes.choose_multiple(rng, 4).collect();
-    password[*random_indexes[0] as usize] = sample(rng, 10, 00);
-    password[*random_indexes[1] as usize] = sample(rng, 26, 10);
-    password[*random_indexes[2] as usize] = sample(rng, 26, 36);
-    password[*random_indexes[3] as usize] = sample(rng, 32, 62);
-    unsafe { String::from_utf8_unchecked(password) }
+    let random_indexes = get_random_indexes(buffer.len() as u32, rng);
+    buffer[random_indexes[0] as usize] = sample(rng, 10, 00);
+    buffer[random_indexes[1] as usize] = sample(rng, 26, 10);
+    buffer[random_indexes[2] as usize] = sample(rng, 26, 36);
+    buffer[random_indexes[3] as usize] = sample(rng, 32, 62);
 }
 
-fn sample(rng: &mut ThreadRng, length: u32, offset: u32) -> u8 {
-    LETTERS[((rng.gen::<u32>() % length) + offset) as usize] as u8
+#[inline(always)]
+fn sample(rng: &mut impl RngCore, length: u32, offset: u32) -> u8 {
+    LETTERS[((rng.gen::<u32>() % length) + offset) as usize]
+}
+
+fn get_random_indexes(len: u32, rng: &mut impl RngCore) -> [u32; 4] {
+    assert!(len >= 4);
+    let mut indexes = Vec::with_capacity(4);
+    for j in len - 4..len {
+        let random_index = rng.gen_range(0..=j);
+        if let Some(index) = indexes.iter().position(|index| *index == random_index) {
+            indexes.insert(index, j);
+        } else {
+            indexes.push(random_index);
+        }
+    }
+    indexes.try_into().unwrap()
+}
+
+#[cfg(test)]
+mod tests {
+    use rand::prelude::*;
+    use crate::get_random_indexes;
+
+    #[test]
+    fn should_insert_with_duplicates() {
+        let mut rng = StdRng::seed_from_u64(0);
+        let actual = get_random_indexes(4, &mut rng);
+        assert_eq!(actual, [0, 3, 1, 2]);
+    }
 }
